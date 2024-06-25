@@ -1,3 +1,8 @@
+/*
+ *
+ * Sorry for German Comments
+ *
+*/
 #include <Arduino.h>
 #include <ArduinoMqttClient.h>
 #include <WiFiS3.h>
