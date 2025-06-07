@@ -37,16 +37,16 @@ msv prevMillisUARTtx = 0; //reserviert
 
 uint8_t cdwnStart = 0; //läuft countdown?
 
-uint16_t empfangeneSek; //wieviele restsekunden auf dem timer sind (aus mqtt)
-uint8_t timerHrs; //Ganze Reststunden
-uint8_t timerMins; //Ganze Restminuten
-uint8_t timerSecs; //Ganze Restsekunden
+uint16_t empfangeneSek = 0; //wieviele restsekunden auf dem timer sind (aus mqtt)
+uint8_t timerHrs = 0; //Ganze Reststunden
+uint8_t timerMins = 0; //Ganze Restminuten
+uint8_t timerSecs = 0; //Ganze Restsekunden
 
-uint8_t hours; //Daten aus NTP
-uint8_t mins; //Daten aus NTP
+uint8_t hours = 0; //Daten aus NTP
+uint8_t mins = 0; //Daten aus NTP
 
-uint8_t firstByte; //Zahl für die ersten zwei ziffern des 7-Segment
-uint8_t secondByte; //Zahl für die letzten zwei ziffern des 7-Segment
+uint8_t firstByte = 0; //Zahl für die ersten zwei ziffern des 7-Segment
+uint8_t secondByte = 0; //Zahl für die letzten zwei ziffern des 7-Segment
 
 uint8_t blinkVar = 0; //nur für ausgabe der geschwindigkeit über einen output
 
