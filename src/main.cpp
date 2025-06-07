@@ -119,13 +119,6 @@ void loop(){
 		secondByte = mins;
 	}
 
-	if(millis() - prevMillisUARTtx > INTERVAL10HZ){
-		prevMillisUARTtx = millis();
-		Serial1.write(firstByte);
-		Serial1.write(secondByte);
-		Serial1.write(255);
-	} //Daten über UART Ausgeben
-
 	digitalWrite(LED_BUILTIN, !digitalRead(blinkVar));
 
 	if(millis() - prevMillisCdwn > INTERVAL1S){
