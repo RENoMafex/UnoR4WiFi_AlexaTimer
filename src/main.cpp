@@ -42,20 +42,20 @@ uint8_t mins; //data from NTP
 uint8_t firstByte; //Zahl für die ersten zwei ziffern des 7-Segment
 uint8_t secondByte; //Zahl für die letzten zwei ziffern des 7-Segment
 
-bool blinkVar = false; //nur für ausgabe der geschwindigkeit über einen output
+bool blinkVar = false; //flips once per loop() cycle
 
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), abfrageintervall von server in ms (1min)
+NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), refreshinterval from server in ms (1min)
 
 void setup(){
-	char clientId [15]; //Maximale länge clientid für mqtt
+	char clientId [15]; //max length clientid for mqtt
 	pinMode(LED_BUILTIN, 1);
 	digitalWrite(LED_BUILTIN, blinkVar);
 	Serial.begin(usbBaud);
-	while(!Serial); // Auf native USB warten.
+	while(!Serial); //wait for native USB
 	Serial.print("USBSerial Initialised at ");
 	Serial.print(usbBaud);
 	Serial.println(" baud");
@@ -69,7 +69,7 @@ void setup(){
 
 	Serial.println("WiFi connection established!");
 
-	delay(random(100, 500)); //bisschen zufall in die clientid bringen
+	delay(random(100, 500)); //bring some randomness into the clientid
 
 	snprintf(clientId, 15, "UnoR4WiFi_%lu", millis() );
 
@@ -95,12 +95,12 @@ void setup(){
 	timeClient.update();
 
 
-	//UART Starten
+	//start UART
 	Serial1.begin(9600);
 
 	Serial.println("Leaving Setup.");
 	Serial.println();
-	delay(500);
+
 	prevMillisCdwn = millis();
 }
 
@@ -126,6 +126,7 @@ void loop(){
 	} //Daten über UART Ausgeben
 
 	digitalWrite(LED_BUILTIN, !digitalRead(blinkVar));
+
 	if(millis() - prevMillisCdwn > INTERVAL1S){
 		prevMillisCdwn = prevMillisCdwn + INTERVAL1S;
 		if(cdwnStart){
@@ -146,7 +147,7 @@ void loop(){
 			}
 		}
 	}
-	// Countdown incl Stoppen des Countdowns bei 0
+	// Countdown incl stop at 0
 	if(uint8_t messageSize = mqttClient.parseMessage()){
 		Serial.println();
 		Serial.print("MQTTrx: ");
@@ -173,40 +174,40 @@ void loop(){
 			cdwnStart = 0;
 		}
 	}
-	//empfangen sowie Umrechnung und start des Countdowns
-	
+	// recieve as well as starting the countdown
+
+	//poll NTP and write to vars
 	if(millis() - prevMillisNtpToVar > INTERVAL5S){
 		prevMillisNtpToVar = millis();
-		timeClient.update(); //Jedes mal NTP pollen über WiFi!!! Notwendig?
+		timeClient.update(); //Necessary every time??
 		hours = timeClient.getHours();
 		mins = timeClient.getMinutes();
 	}
-	//NTP Pollen und daten in Variablen schreiben
 
+	//poll mqtt once a minute that connection doesnt fail
 	if(millis() - prevMillisMqttPoll > INTERVAL1M){
 		prevMillisMqttPoll = millis();
 		mqttClient.poll();
 	}
-	//Verbindung zum Mqtt sichern.
 
+	//give out some debugging over usb.
 	if(millis() - prevMillisDebug > INTERVAL1S){
 		prevMillisDebug = millis();
 		debugUsb();
 	}
-	//Einige Variablen per usb ausgeben
 }
 
 void debugUsb(){
 	Serial.println();
 	Serial.println("---Start of Debugging---");
 
-	Serial.print("EmpfangeneSek: ");
+	Serial.print("ReceivedSec: ");
 	Serial.println(receivedSec);
-	Serial.print("TimerRestHRS: ");
+	Serial.print("TimerRemainingHRS: ");
 	Serial.println(timerHrs);
-	Serial.print("TimerRestMIN: ");
+	Serial.print("TimerRemainingMIN: ");
 	Serial.println(timerMins);
-	Serial.print("TimerRestSEC: ");
+	Serial.print("TimerRemainingSEC: ");
 	Serial.println(timerSecs);
 	Serial.print("NTPhrs: ");
 	Serial.println(hours);
