@@ -18,51 +18,49 @@ typedef uint32_t msv;
 
 const uint32_t usbBaud = 115200;
 
-const char broker [] = "192.168.0.2"; //ip mqtt broker
+constexpr char broker [] = "192.168.0.2"; //ip mqtt broker
 const uint16_t port = 1883; //port mqtt
-const char topic [] = "/AlexaTimer/sekbisende"; //mqtt topic
+constexpr char topic [] = "/AlexaTimer/sekbisende"; //mqtt topic
 
-/* Daten ab hier kommen aus "arduino_secrets.h" */
-char ssid [] = SECRET_SSID; //SSID Wlan
-char pass [] = SECRET_PASS; //Passwort Wlan
+char ssid [] = SECRET_SSID; //SSID WiFi
+char pass [] = SECRET_PASS; //Passwort WiFi
 char user [] = SECRET_USER; //mqtt Username
 char clientPass [] = SECRET_CLIENT_PASS; //mqtt passwort
-/* Daten bis hier kommen aus "arduino_secrets.h" */
 
-msv prevMillisNtpToVar = 0; //reserviert
-msv prevMillisMqttPoll = 0; //reserviert
-msv prevMillisDebug = 0; //reserviert
-msv prevMillisCdwn = 0; //reserviert
-msv prevMillisUARTtx = 0; //reserviert
+msv prevMillisNtpToVar = 0; //reserved
+msv prevMillisMqttPoll = 0; //reserved
+msv prevMillisDebug = 0; //reserved
+msv prevMillisCdwn = 0; //reserved
+msv prevMillisUARTtx = 0; //reserved
 
-uint8_t cdwnStart = 0; //läuft countdown?
+bool cdwnStart = false; //is countdown running?
 
-uint16_t empfangeneSek = 0; //wieviele restsekunden auf dem timer sind (aus mqtt)
-uint8_t timerHrs = 0; //Ganze Reststunden
-uint8_t timerMins = 0; //Ganze Restminuten
-uint8_t timerSecs = 0; //Ganze Restsekunden
+uint16_t receivedSec = 0; //how many seconds are left on the timer (according to mqtt)
+uint8_t timerHrs = 0; //whole remaining hours
+uint8_t timerMins = 0; //whole remaining minutes
+uint8_t timerSecs = 0; //whole remaining seconds
 
-uint8_t hours = 0; //Daten aus NTP
-uint8_t mins = 0; //Daten aus NTP
+uint8_t hours = 0; //data from NTP
+uint8_t mins = 0; //data from NTP
 
-uint8_t firstByte = 0; //Zahl für die ersten zwei ziffern des 7-Segment
-uint8_t secondByte = 0; //Zahl für die letzten zwei ziffern des 7-Segment
+uint8_t firstByte = 0; //number for the first two digits of the 7seg display
+uint8_t secondByte = 0; //number for the second two digits of the 7seg display
 
-uint8_t blinkVar = 0; //nur für ausgabe der geschwindigkeit über einen output
+bool blinkVar = false; //flips once per loop() cycle
 
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), abfrageintervall von server in ms (1min)
+NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), refreshinterval from server in ms (1min)
 
 void setup(){
-	char clientId [15]; //Maximale länge clientid für mqtt
+	char clientId [15]; //max length clientid mqtt
 
 	pinMode(LED_BUILTIN, 1);
 	digitalWrite(LED_BUILTIN, 1);
 	Serial.begin(usbBaud);
-	while(!Serial); // Auf native USB warten.
+	while(!Serial); // wait for native usb
 	Serial.print("USBSerial Initialised at ");
 	Serial.print(usbBaud);
 	Serial.println(" baud");
@@ -76,7 +74,7 @@ void setup(){
 
 	Serial.println("WiFi connection established!");
 
-	delay(random(100, 500)); //bisschen zufall in die clientid bringen
+	delay(random(100, 500)); //randomization for clientid (if the arduino restarts/resets)
 
 	snprintf(clientId, 15, "UnoR4WiFi_%lu", millis() );
 
@@ -102,7 +100,7 @@ void setup(){
 	timeClient.update();
 
 
-	//UART Starten
+	//UART start
 	Serial1.begin(9600);
 
 	Serial.println("Leaving Setup.");
@@ -169,47 +167,46 @@ void loop(){
 
 		Serial.println();
 
-		empfangeneSek = atoi(byteIn);
+		receivedSec = atoi(byteIn);
 
-		timerHrs = empfangeneSek/3600;
-		timerMins = (empfangeneSek%3600)/60;
-		timerSecs = empfangeneSek%60;
+		timerHrs = receivedSec/3600;
+		timerMins = (receivedSec%3600)/60;
+		timerSecs = receivedSec%60;
 
-		if(empfangeneSek){
+		if(receivedSec){
 			cdwnStart = 1;
 		}else{
 			cdwnStart = 0;
 		}
 	}
-	//empfangen sowie Umrechnung und start des Countdowns
-	
+
+	//poll ntp and write to vars
 	if(millis() - prevMillisNtpToVar > INTERVAL5S){
 		prevMillisNtpToVar = millis();
-		timeClient.update(); //Jedes mal NTP pollen über WiFi!!! Notwendig?
+		timeClient.update(); // really needed every time??
 		hours = timeClient.getHours();
 		mins = timeClient.getMinutes();
 	}
-	//NTP Pollen und daten in Variablen schreiben
 
+	//hold connection to mqtt server
 	if(millis() - prevMillisMqttPoll > INTERVAL1M){
 		prevMillisMqttPoll = millis();
 		mqttClient.poll();
 	}
-	//Verbindung zum Mqtt sichern.
 
+	//output some vars via usb
 	if(millis() - prevMillisDebug > INTERVAL1S){
 		prevMillisDebug = millis();
 		debugUsb();
 	}
-	//Einige Variablen per usb ausgeben
 }
 
 void debugUsb(){
 	Serial.println();
 	Serial.println("---Start of Debugging---");
 
-	Serial.print("EmpfangeneSek: ");
-	Serial.println(empfangeneSek);
+	Serial.print("receivedSec: ");
+	Serial.println(receivedSec);
 	Serial.print("TimerRestHRS: ");
 	Serial.println(timerHrs);
 	Serial.print("TimerRestMIN: ");
