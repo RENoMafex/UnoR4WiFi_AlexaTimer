@@ -9,7 +9,9 @@
 #include <intervals.hpp>
 
 void debugUsb();
-void shiftOutLatched(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val); //maybe make a template for this?
+
+//overload for using latch pin
+void shiftOut(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val);
 
 typedef uint32_t msv;
 
@@ -18,6 +20,8 @@ constexpr uint32_t usbBaud = 115200;
 constexpr char broker [] = "192.168.0.2"; //ip mqtt broker
 constexpr uint16_t port = 1883; //port mqtt
 constexpr char topic [] = "/AlexaTimer/sekbisende"; //mqtt topic
+
+constexpr pin_size_t dataPin = 5, clockPin = 6, blankPin = 7;
 
 char ssid [] = SECRET_SSID; //SSID WiFi
 char pass [] = SECRET_PASS; //Passwort WiFi
@@ -28,20 +32,19 @@ msv prevMillisNtpToVar = 0; //reserved
 msv prevMillisMqttPoll = 0; //reserved
 msv prevMillisDebug = 0; //reserved
 msv prevMillisCdwn = 0; //reserved
-msv prevMillisUARTtx = 0; //reserved
 
 bool cdwnStart = false; //is countdown running?
 
-uint16_t receivedSec; //how many seconds are left on the timer (according to mqtt)
-uint8_t timerHrs; //whole remaining hours
-uint8_t timerMins; //whole remaining minutes
-uint8_t timerSecs; //whole remaining seconds
+uint16_t receivedSec = 0; //how many seconds are left on the timer (according to mqtt)
+uint8_t timerHrs = 0; //whole remaining hours
+uint8_t timerMins = 0; //whole remaining minutes
+uint8_t timerSecs = 0; //whole remaining seconds
 
-uint8_t hours; //data from NTP
-uint8_t mins; //data from NTP
+uint8_t hours = 0; //data from NTP
+uint8_t mins = 0; //data from NTP
 
-uint8_t firstByte; //Zahl für die ersten zwei ziffern des 7-Segment
-uint8_t secondByte; //Zahl für die letzten zwei ziffern des 7-Segment
+uint8_t firstByte = 0; //Zahl für die ersten zwei ziffern des 7-Segment
+uint8_t secondByte = 0; //Zahl für die letzten zwei ziffern des 7-Segment
 
 bool blinkVar = false; //flips once per loop() cycle
 
@@ -55,6 +58,12 @@ void setup(){
 	char clientId [15]; //max length clientid for mqtt
 	pinMode(LED_BUILTIN, 1);
 	digitalWrite(LED_BUILTIN, blinkVar);
+	pinMode(dataPin, 1);
+	pinMode(clockPin, 1);
+	pinMode(blankPin, 1);
+	digitalWrite(dataPin, 0);
+	digitalWrite(clockPin, 0);
+	digitalWrite(blankPin, 1);
 	Serial.begin(usbBaud);
 	while(!Serial); //wait for native USB
 	Serial.print("USBSerial Initialised at ");
@@ -94,10 +103,6 @@ void setup(){
 	timeClient.begin();
 
 	timeClient.update();
-
-
-	//start UART
-	Serial1.begin(9600);
 
 	Serial.println("Leaving Setup.");
 	Serial.println();
@@ -215,7 +220,7 @@ void debugUsb(){
 	Serial.println();
 }
 
-void shiftOutLatched(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val) {
+void shiftOut(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val) {
 	digitalWrite(latchPin, LOW);
 	shiftOut(dataPin, clockPin, bitOrder, val);
 	digitalWrite(latchPin, HIGH);
