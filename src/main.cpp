@@ -9,6 +9,7 @@
 #include <intervals.hpp>
 
 void debugUsb();
+void shiftOutLatched(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val); //maybe make a template for this?
 
 typedef uint32_t msv;
 
@@ -219,4 +220,10 @@ void debugUsb(){
 
 	Serial.println("---End of Debugging---");
 	Serial.println();
+}
+
+void shiftOutLatched(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val) {
+	digitalWrite(latchPin, LOW);
+	shiftOut(dataPin, clockPin, bitOrder, val);
+	digitalWrite(latchPin, HIGH);
 }
