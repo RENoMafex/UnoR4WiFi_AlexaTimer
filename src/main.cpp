@@ -10,7 +10,7 @@
 #include <NTPClient.h>
 
 #include <arduino_secrets.h>
-#include <intervals.h>
+#include <intervals.hpp>
 
 void debugUsb();
 
@@ -54,7 +54,7 @@ WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, __INTERVAL1M); //ntpserver, timeoffset in s (2h), abfrageintervall von server in ms (1min)
+NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), abfrageintervall von server in ms (1min)
 
 void setup(){
 	char clientId [15]; //Maximale länge clientid für mqtt
@@ -92,7 +92,7 @@ void setup(){
 	while(!mqttClient.connect(broker, port)){
 		Serial.print("MQTT connection failed! Error code = ");
 		Serial.println(mqttClient.connectError());
-		delay(__INTERVAL1S);
+		delay(INTERVAL1S);
 	}
 	Serial.println("MQTT connection established!");
 	mqttClient.subscribe(topic, 0);
@@ -125,7 +125,7 @@ void loop(){
 		secondByte = mins;
 	}
 
-	if(millis() - prevMillisUARTtx > __INTERVAL10HZ){
+	if(millis() - prevMillisUARTtx > INTERVAL10HZ){
 		prevMillisUARTtx = millis();
 		Serial1.write(firstByte);
 		Serial1.write(secondByte);
@@ -134,8 +134,8 @@ void loop(){
 
 	digitalWrite(LED_BUILTIN, blinkVar);
 	blinkVar =! blinkVar;
-	if(millis() - prevMillisCdwn > __INTERVAL1S){
-		prevMillisCdwn = prevMillisCdwn + __INTERVAL1S;
+	if(millis() - prevMillisCdwn > INTERVAL1S){
+		prevMillisCdwn = prevMillisCdwn + INTERVAL1S;
 		if(cdwnStart){
 			timerSecs--;
 			if(timerSecs == 255){
@@ -183,7 +183,7 @@ void loop(){
 	}
 	//empfangen sowie Umrechnung und start des Countdowns
 	
-	if(millis() - prevMillisNtpToVar > __INTERVAL5S){
+	if(millis() - prevMillisNtpToVar > INTERVAL5S){
 		prevMillisNtpToVar = millis();
 		timeClient.update(); //Jedes mal NTP pollen über WiFi!!! Notwendig?
 		hours = timeClient.getHours();
@@ -191,13 +191,13 @@ void loop(){
 	}
 	//NTP Pollen und daten in Variablen schreiben
 
-	if(millis() - prevMillisMqttPoll > __INTERVAL1M){
+	if(millis() - prevMillisMqttPoll > INTERVAL1M){
 		prevMillisMqttPoll = millis();
 		mqttClient.poll();
 	}
 	//Verbindung zum Mqtt sichern.
 
-	if(millis() - prevMillisDebug > __INTERVAL1S){
+	if(millis() - prevMillisDebug > INTERVAL1S){
 		prevMillisDebug = millis();
 		debugUsb();
 	}
