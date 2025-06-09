@@ -13,8 +13,6 @@ void debugUsb();
 //overload for using latch pin
 void shiftOut(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val);
 
-typedef uint32_t msv;
-
 constexpr uint32_t usbBaud = 115200;
 
 constexpr char broker [] = "192.168.0.2"; //ip mqtt broker
@@ -28,10 +26,11 @@ char pass [] = SECRET_PASS; //Passwort WiFi
 char user [] = SECRET_USER; //mqtt Username
 char clientPass [] = SECRET_CLIENT_PASS; //mqtt passwort
 
-msv prevMillisNtpToVar = 0; //reserved
-msv prevMillisMqttPoll = 0; //reserved
-msv prevMillisDebug = 0; //reserved
-msv prevMillisCdwn = 0; //reserved
+uint32_t prevMillisNtpToVar = 0; //reserved
+uint32_t prevMillisMqttPoll = 0; //reserved
+uint32_t prevMillisDebug = 0; //reserved
+uint32_t prevMillisCdwn = 0; //reserved
+uint32_t prevMillisShiftOut = 0; //reserved
 
 bool cdwnStart = false; //is countdown running?
 
@@ -111,6 +110,7 @@ void setup(){
 }
 
 void loop(){
+	// is this if statement still needed?
 	if(cdwnStart){
 		if(timerHrs == 0){
 			firstByte = timerMins;
@@ -124,8 +124,15 @@ void loop(){
 		secondByte = mins;
 	}
 
+	if(millis() - prevMillisShiftOut > INTERVAL10HZ) {
+		prevMillisShiftOut += INTERVAL10HZ;
+
+		// insert output to shift regs here!
+	}
+
 	digitalWrite(LED_BUILTIN, !digitalRead(blinkVar));
 
+	// Countdown incl stop at 0
 	if(millis() - prevMillisCdwn > INTERVAL1S){
 		prevMillisCdwn = prevMillisCdwn + INTERVAL1S;
 		if(cdwnStart){
@@ -146,7 +153,7 @@ void loop(){
 			}
 		}
 	}
-	// Countdown incl stop at 0
+
 	if(uint8_t messageSize = mqttClient.parseMessage()){
 		Serial.println();
 		Serial.print("MQTTrx: ");
