@@ -1,3 +1,4 @@
+#pragma region global
 
 #include <Arduino.h>
 #include <ArduinoMqttClient.h>
@@ -7,11 +8,9 @@
 
 #include <arduino_secrets.h>
 #include <intervals.hpp>
+#include <quadshift.hpp>
 
 void debugUsb();
-
-//overload for using latch pin
-void shiftOut(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val);
 
 constexpr uint32_t usbBaud = 115200;
 
@@ -52,6 +51,8 @@ MqttClient mqttClient(wifiClient);
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), refreshinterval from server in ms (1min)
+
+#pragma endregion
 
 void setup(){
 	char clientId [15]; //max length clientid for mqtt
@@ -225,10 +226,4 @@ void debugUsb(){
 
 	Serial.println("---End of Debugging---");
 	Serial.println();
-}
-
-void shiftOut(pin_size_t dataPin, pin_size_t clockPin, pin_size_t latchPin, BitOrder bitOrder, uint8_t val) {
-	digitalWrite(latchPin, LOW);
-	shiftOut(dataPin, clockPin, bitOrder, val);
-	digitalWrite(latchPin, HIGH);
 }
