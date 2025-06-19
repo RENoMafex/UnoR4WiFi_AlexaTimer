@@ -5,6 +5,7 @@
 #include <WiFiS3.h>
 #include <WiFiUdp.h>
 #include <NTPClient.h>
+#include <shiftOut.hpp>
 
 #include <arduino_secrets.h>
 #include <intervals.hpp>
@@ -25,11 +26,11 @@ char pass [] = SECRET_PASS; //Passwort WiFi
 char user [] = SECRET_USER; //mqtt Username
 char clientPass [] = SECRET_CLIENT_PASS; //mqtt passwort
 
-uint32_t prevMillisNtpToVar = 0; //reserved
-uint32_t prevMillisMqttPoll = 0; //reserved
-uint32_t prevMillisDebug = 0; //reserved
-uint32_t prevMillisCdwn = 0; //reserved
-uint32_t prevMillisShiftOut = 0; //reserved
+timer_t prevMillisNtpToVar = 0; //reserved
+timer_t prevMillisMqttPoll = 0; //reserved
+timer_t prevMillisDebug = 0; //reserved
+timer_t prevMillisCdwn = 0; //reserved
+timer_t prevMillisShiftOut = 0; //reserved
 
 bool cdwnStart = false; //is countdown running?
 
