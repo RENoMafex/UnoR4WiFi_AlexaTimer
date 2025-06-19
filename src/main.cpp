@@ -9,7 +9,7 @@
 
 #include <arduino_secrets.h>
 #include <intervals.hpp>
-#include <quadshift.hpp>
+#include <toSevSeg.hpp>
 
 void debugUsb();
 
