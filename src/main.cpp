@@ -42,8 +42,10 @@ uint8_t timerSecs = 0; //whole remaining seconds
 uint8_t hours = 0; //data from NTP
 uint8_t mins = 0; //data from NTP
 
-uint8_t firstByte = 0; //Zahl für die ersten zwei ziffern des 7-Segment
-uint8_t secondByte = 0; //Zahl für die letzten zwei ziffern des 7-Segment
+uint8_t firstNum = 0;   // Number for the first digit of the 7-segment display
+uint8_t secondNum = 0;  // Number for the second digit of the 7-segment display
+uint8_t thirdNum = 0;   // Number for the third digit of the 7-segment display
+uint8_t fourthNum = 0;   // Number for the fourth digit of the 7-segment display
 
 bool blinkVar = false; //flips once per loop() cycle
 
@@ -112,24 +114,36 @@ void setup(){
 }
 
 void loop(){
-	// is this if statement still needed?
 	if(cdwnStart){
 		if(timerHrs == 0){
-			firstByte = timerMins;
-			secondByte = timerSecs;
+			firstNum = timerMins / 10;
+			secondNum = timerMins % 10;
+			thirdNum = timerSecs / 10;
+			fourthNum = timerSecs % 10;
 		}else{
-			firstByte = timerHrs;
-			secondByte = timerMins;
+			firstNum = timerHrs / 10;
+			secondNum = timerHrs % 10;
+			thirdNum = timerMins / 10;
+			fourthNum = timerMins % 10;
 		}
 	}else{
-		firstByte = hours;
-		secondByte = mins;
+		firstNum = hours / 10;
+		secondNum = hours % 10;
+		thirdNum = mins / 10;
+		fourthNum = mins % 10;
 	}
 
 	if(millis() - prevMillisShiftOut > INTERVAL10HZ) {
 		prevMillisShiftOut += INTERVAL10HZ;
 
-		// insert output to shift regs here!
+		uint8_t vals[] = {
+			toSevSeg(firstNum),
+			toSevSeg(secondNum),
+			toSevSeg(thirdNum),
+			toSevSeg(fourthNum)
+		};
+
+		shiftOut(dataPin, clockPin, blankPin, MSBFIRST, vals, sizeof(vals)/sizeof(vals[0]));
 	}
 
 	digitalWrite(LED_BUILTIN, !digitalRead(blinkVar));
