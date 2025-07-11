@@ -174,7 +174,7 @@ void loop(){
 		Serial.println();
 		Serial.print("MQTTrx: ");
 		uint8_t bitCount = messageSize + 1;
-		char byteIn[bitCount];
+		char byteIn[bitCount] = {};
 		bitCount = 0;
 		while (mqttClient.available()) {
 			byteIn[bitCount] = mqttClient.read();
