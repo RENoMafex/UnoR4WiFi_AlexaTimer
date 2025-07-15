@@ -1,5 +1,10 @@
 #pragma region global
 
+#ifndef USB_Serial
+#define USB_Serial _UART1_
+#define UNDEFINE_USB_SERIAL
+#endif
+
 #include <Arduino.h>
 #include <ArduinoMqttClient.h>
 #include <WiFiS3.h>
@@ -65,20 +70,20 @@ void setup(){
 	digitalWrite(dataPin, 0);
 	digitalWrite(clockPin, 0);
 	digitalWrite(blankPin, 1);
-	Serial.begin(usbBaud);
-	while(!Serial); //wait for native USB
-	Serial.print("USBSerial Initialised at ");
-	Serial.print(usbBaud);
-	Serial.println(" baud");
-	Serial.print("Trying to connect to ");
-	Serial.println(ssid);
+	USB_Serial.begin(usbBaud);
+	while(!USB_Serial); //wait for native USB
+	USB_Serial.print("USBSerial Initialised at ");
+	USB_Serial.print(usbBaud);
+	USB_Serial.println(" baud");
+	USB_Serial.print("Trying to connect to ");
+	USB_Serial.println(ssid);
 
 	while(WiFi.begin(ssid, pass) != WL_CONNECTED){
-		Serial.println("WiFi connection failed!");
+		USB_Serial.println("WiFi connection failed!");
 		delay(500);
 	}
 
-	Serial.println("WiFi connection established!");
+	USB_Serial.println("WiFi connection established!");
 
 	delay(random(100, 500)); //bring some randomness into the clientid
 
@@ -87,26 +92,26 @@ void setup(){
 	delay(100);
 
 	mqttClient.setId(clientId);
-	Serial.print("ClientID: ");
-	Serial.println(clientId);
+	USB_Serial.print("ClientID: ");
+	USB_Serial.println(clientId);
 	mqttClient.setUsernamePassword(user, clientPass);
 
 	delay(100);
 
 	while(!mqttClient.connect(broker, port)){
-		Serial.print("MQTT connection failed! Error code = ");
-		Serial.println(mqttClient.connectError());
+		USB_Serial.print("MQTT connection failed! Error code = ");
+		USB_Serial.println(mqttClient.connectError());
 		delay(INTERVAL1S);
 	}
-	Serial.println("MQTT connection established!");
+	USB_Serial.println("MQTT connection established!");
 	mqttClient.subscribe(topic, 0);
 
 	timeClient.begin();
 
 	timeClient.update();
 
-	Serial.println("Leaving Setup.");
-	Serial.println();
+	USB_Serial.println("Leaving Setup.");
+	USB_Serial.println();
 
 	prevMillisCdwn = millis();
 }
@@ -170,18 +175,18 @@ void loop(){
 	}
 
 	if(uint8_t messageSize = mqttClient.parseMessage()){
-		Serial.println();
-		Serial.print("MQTTrx: ");
+		USB_Serial.println();
+		USB_Serial.print("MQTTrx: ");
 		uint8_t bitCount = messageSize + 1;
 		char byteIn[bitCount] = {};
 		bitCount = 0;
 		while (mqttClient.available()) {
 			byteIn[bitCount] = mqttClient.read();
-			Serial.print(byteIn[bitCount]);
+			USB_Serial.print(byteIn[bitCount]);
 			bitCount++;
 		}
 
-		Serial.println();
+		USB_Serial.println();
 
 		receivedSec = atoi(byteIn);
 
@@ -219,25 +224,30 @@ void loop(){
 }
 
 void debugUsb(){
-	Serial.println();
-	Serial.println("---Start of Debugging---");
+	USB_Serial.println();
+	USB_Serial.println("---Start of Debugging---");
 
-	Serial.print("ReceivedSec: ");
-	Serial.println(receivedSec);
-	Serial.print("TimerRemainingHRS: ");
-	Serial.println(timerHrs);
-	Serial.print("TimerRemainingMIN: ");
-	Serial.println(timerMins);
-	Serial.print("TimerRemainingSEC: ");
-	Serial.println(timerSecs);
-	Serial.print("NTPhrs: ");
-	Serial.println(hours);
-	Serial.print("NTPmins: ");
-	Serial.println(mins);
-	Serial.print("CdwnRun: ");
-	Serial.println(cdwnStart);
+	USB_Serial.print("ReceivedSec: ");
+	USB_Serial.println(receivedSec);
+	USB_Serial.print("TimerRemainingHRS: ");
+	USB_Serial.println(timerHrs);
+	USB_Serial.print("TimerRemainingMIN: ");
+	USB_Serial.println(timerMins);
+	USB_Serial.print("TimerRemainingSEC: ");
+	USB_Serial.println(timerSecs);
+	USB_Serial.print("NTPhrs: ");
+	USB_Serial.println(hours);
+	USB_Serial.print("NTPmins: ");
+	USB_Serial.println(mins);
+	USB_Serial.print("CdwnRun: ");
+	USB_Serial.println(cdwnStart);
 
 
-	Serial.println("---End of Debugging---");
-	Serial.println();
+	USB_Serial.println("---End of Debugging---");
+	USB_Serial.println();
 }
+
+#ifdef UNDEFINE_USB_SERIAL
+#undef UNDEFINE_USB_SERIAL
+#undef USB_Serial
+#endif
