@@ -47,8 +47,6 @@ uint8_t secondNum = 0;  // Number for the second digit of the 7-segment display
 uint8_t thirdNum = 0;   // Number for the third digit of the 7-segment display
 uint8_t fourthNum = 0;   // Number for the fourth digit of the 7-segment display
 
-bool blinkVar = false; //flips once per loop() cycle
-
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
@@ -59,11 +57,11 @@ NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, 
 
 void setup(){
 	char clientId [15]; //max length clientid for mqtt
-	pinMode(LED_BUILTIN, 1);
-	digitalWrite(LED_BUILTIN, blinkVar);
-	pinMode(dataPin, 1);
-	pinMode(clockPin, 1);
-	pinMode(blankPin, 1);
+	pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(dataPin, OUTPUT);
+	pinMode(clockPin, OUTPUT);
+	pinMode(blankPin, OUTPUT);
+	digitalWrite(LED_BUILTIN, 0);
 	digitalWrite(dataPin, 0);
 	digitalWrite(clockPin, 0);
 	digitalWrite(blankPin, 1);
@@ -136,6 +134,7 @@ void loop(){
 	if(millis() - prevMillisShiftOut > INTERVAL10HZ) {
 		prevMillisShiftOut += INTERVAL10HZ;
 
+		// Array for shiftOut overload from "RENoMafex/shiftOut" on GitHub.
 		uint8_t vals[] = {
 			toSevSeg(firstNum),
 			toSevSeg(secondNum),
@@ -146,7 +145,7 @@ void loop(){
 		shiftOut(dataPin, clockPin, blankPin, MSBFIRST, vals, sizeof(vals)/sizeof(vals[0]));
 	}
 
-	digitalWrite(LED_BUILTIN, !digitalRead(blinkVar));
+	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
 	// Countdown incl stop at 0
 	if(millis() - prevMillisCdwn > INTERVAL1S){
