@@ -1,7 +1,7 @@
 #pragma region global
 
 #ifndef USB_Serial
-#define USB_Serial _UART1_
+#define USB_Serial Serial
 #define UNDEFINE_USB_SERIAL
 #endif
 
