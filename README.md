@@ -25,3 +25,4 @@ there is also a [Serial output version](https://github.com/RENoMafex/UnoR4WiFi_A
 
 ## TODO:
 - Document how to set this project up in ioBroker.
+- Design circuit board
