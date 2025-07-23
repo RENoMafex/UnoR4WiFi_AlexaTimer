@@ -11,6 +11,7 @@ there is also a [Serial output version](https://github.com/RENoMafex/UnoR4WiFi_A
 - 4 shift registers (ex. SN74HC595)
 - 4 7-Segment displays
   - Maybe a few hands full of MOSFETs, if you use bigger 7-Segment displays
+- A soldering iron with some tin
 
 ## Things you will find in this Repo (when finished):
 - KiCad files for a circuit board
