@@ -20,16 +20,18 @@ void debugUsb();
 
 constexpr uint32_t usbBaud = 115200;
 
-constexpr char broker [] = "192.168.0.2"; //ip mqtt broker
+const std::string broker = "192.168.0.2"; //ip mqtt broker
 constexpr uint16_t port = 1883; //port mqtt
-constexpr char topic [] = "/AlexaTimer/sekbisende"; //mqtt topic
+const std::string topic = "/AlexaTimer/sekbisende"; //mqtt topic
+
+const std::string ntpServer = "ptbtime1.ptb.de";
 
 constexpr pin_size_t dataPin = 5, clockPin = 6, blankPin = 7;
 
-char ssid [] = SECRET_SSID; //SSID WiFi
-char pass [] = SECRET_PASS; //Passwort WiFi
-char user [] = SECRET_USER; //mqtt Username
-char clientPass [] = SECRET_CLIENT_PASS; //mqtt passwort
+std::string ssid = SECRET_SSID; //SSID WiFi
+std::string pass = SECRET_PASS; //Passwort WiFi
+std::string user = SECRET_USER; //mqtt Username
+std::string clientPass = SECRET_CLIENT_PASS; //mqtt passwort
 
 timer_t prevMillisNtpToVar = 0; //reserved
 timer_t prevMillisMqttPoll = 0; //reserved
@@ -47,16 +49,16 @@ uint8_t timerSecs = 0; //whole remaining seconds
 uint8_t hours = 0; //data from NTP
 uint8_t mins = 0; //data from NTP
 
-uint8_t firstNum = 0;   // Number for the first digit of the 7-segment display
-uint8_t secondNum = 0;  // Number for the second digit of the 7-segment display
-uint8_t thirdNum = 0;   // Number for the third digit of the 7-segment display
-uint8_t fourthNum = 0;   // Number for the fourth digit of the 7-segment display
+uint8_t firstNum = 0; // Number for the first digit of the 7-segment display
+uint8_t secondNum = 0; // Number for the second digit of the 7-segment display
+uint8_t thirdNum = 0; // Number for the third digit of the 7-segment display
+uint8_t fourthNum = 0; // Number for the fourth digit of the 7-segment display
 
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "ptbtime1.ptb.de", 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), refreshinterval from server in ms (1min)
+NTPClient timeClient(ntpUDP, ntpServer.data(), 7200, INTERVAL1M); //ntpserver, timeoffset in s (2h), refreshinterval from server in ms (1min)
 
 #pragma endregion
 
@@ -76,9 +78,9 @@ void setup(){
 	USB_Serial.print(usbBaud);
 	USB_Serial.println(" baud");
 	USB_Serial.print("Trying to connect to ");
-	USB_Serial.println(ssid);
+	USB_Serial.println(ssid.data());
 
-	while(WiFi.begin(ssid, pass) != WL_CONNECTED){
+	while(WiFi.begin(ssid.data(), pass.data()) != WL_CONNECTED){
 		USB_Serial.println("WiFi connection failed!");
 		delay(500);
 	}
@@ -94,17 +96,17 @@ void setup(){
 	mqttClient.setId(clientId);
 	USB_Serial.print("ClientID: ");
 	USB_Serial.println(clientId);
-	mqttClient.setUsernamePassword(user, clientPass);
+	mqttClient.setUsernamePassword(user.data(), clientPass.data());
 
 	delay(100);
 
-	while(!mqttClient.connect(broker, port)){
+	while(!mqttClient.connect(broker.data(), port)){
 		USB_Serial.print("MQTT connection failed! Error code = ");
 		USB_Serial.println(mqttClient.connectError());
 		delay(INTERVAL1S);
 	}
 	USB_Serial.println("MQTT connection established!");
-	mqttClient.subscribe(topic, 0);
+	mqttClient.subscribe(topic.data(), 0);
 
 	timeClient.begin();
 
@@ -140,20 +142,20 @@ void loop(){
 		prevMillisShiftOut += INTERVAL10HZ;
 
 		// Array for shiftOut overload from "RENoMafex/shiftOut" on GitHub.
-		uint8_t vals[] = {
+		std::array<uint8_t, 4> vals = {
 			toSevSeg(firstNum),
 			toSevSeg(secondNum),
 			toSevSeg(thirdNum),
 			toSevSeg(fourthNum)
 		};
 
-		shiftOut(dataPin, clockPin, blankPin, MSBFIRST, vals, sizeof(vals)/sizeof(vals[0]));
+		shiftOut(dataPin, clockPin, blankPin, MSBFIRST, vals.data(), vals.size());
 	}
 
 	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
 	// Countdown incl stop at 0
-	if(millis() - prevMillisCdwn > INTERVAL1S){
+	if(millis() - prevMillisCdwn > INTERVAL5HZ){
 		prevMillisCdwn = prevMillisCdwn + INTERVAL1S;
 		if(cdwnStart){
 			timerSecs--;
@@ -174,6 +176,7 @@ void loop(){
 		}
 	}
 
+	// recieve as well as starting the countdown
 	if(uint8_t messageSize = mqttClient.parseMessage()){
 		USB_Serial.println();
 		USB_Serial.print("MQTTrx: ");
@@ -195,12 +198,11 @@ void loop(){
 		timerSecs = receivedSec%60;
 
 		if(receivedSec){
-			cdwnStart = 1;
+			cdwnStart = true;
 		}else{
-			cdwnStart = 0;
+			cdwnStart = false;
 		}
 	}
-	// recieve as well as starting the countdown
 
 	//poll NTP and write to vars
 	if(millis() - prevMillisNtpToVar > INTERVAL5S){
@@ -248,6 +250,7 @@ void debugUsb(){
 }
 
 #ifdef UNDEFINE_USB_SERIAL
+// some cleanup
 #undef UNDEFINE_USB_SERIAL
 #undef USB_Serial
 #endif
