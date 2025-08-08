@@ -22,7 +22,7 @@ constexpr uint32_t usbBaud = 115200;
 
 const std::string_view broker = "192.168.0.2"; //ip mqtt broker
 constexpr uint16_t port = 1883; //port mqtt
-const std::string_view topic = "/AlexaTimer/sekbisende"; //mqtt topic
+const std::string_view topic = "/AlexaTimer/sectoend"; //mqtt topic
 
 const std::string_view ntpServer = "ptbtime1.ptb.de";
 
