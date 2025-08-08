@@ -20,11 +20,11 @@ void debugUsb();
 
 constexpr uint32_t usbBaud = 115200;
 
-const std::string broker = "192.168.0.2"; //ip mqtt broker
+const std::string_view broker = "192.168.0.2"; //ip mqtt broker
 constexpr uint16_t port = 1883; //port mqtt
-const std::string topic = "/AlexaTimer/sekbisende"; //mqtt topic
+const std::string_view topic = "/AlexaTimer/sekbisende"; //mqtt topic
 
-const std::string ntpServer = "ptbtime1.ptb.de";
+const std::string_view ntpServer = "ptbtime1.ptb.de";
 
 constexpr pin_size_t dataPin = 5, clockPin = 6, blankPin = 7;
 
