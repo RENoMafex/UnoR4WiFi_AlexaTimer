@@ -1,0 +1,98 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="on" id="ggn%y/p$Ea@4tOfS(/4b" x="138" y="-12">
+    <field name="OID">alexa2.0.Echo-Devices.<!-- device id of the alexa you want to use -->.Timer.nextTimerDate</field>
+    <field name="CONDITION">any</field>
+    <field name="ACK_CONDITION"></field>
+    <statement name="STATEMENT">
+      <block type="controls_if" id="VEoCZS}#qRK+3y#`!C^Z">
+        <mutation else="1"></mutation>
+        <value name="IF0">
+          <block type="logic_compare" id="}vH+ul3)#U^iW6/lBIpZ">
+            <field name="OP">EQ</field>
+            <value name="A">
+              <block type="get_value" id="cILO28{=S*LCN2!Lec,W">
+                <field name="ATTR">val</field>
+                <field name="OID">alexa2.0.Echo-Devices.<!-- device id of the alexa you want to use -->.Timer.nextTimerDate</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number" id="9b`u2F;AWnla1Q0=Ne#y">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="update" id=")[@e8LT(d(vke9H/X.$(">
+            <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+            <field name="OID">0_userdata.0.timer.timetoend</field>
+            <field name="WITH_DELAY">FALSE</field>
+            <value name="VALUE">
+              <block type="math_number" id="O0b_?(pFGG8].mdM4N^D">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="update" id="~dG*E1V.5]kw6WB6X@F}">
+                <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                <field name="OID">0_userdata.0.timer.now</field>
+                <field name="WITH_DELAY">FALSE</field>
+                <value name="VALUE">
+                  <block type="math_number" id="_(eMABHH7yDsVLh5/tOE">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="update" id="fse9~k5/qLEz07Vl~l.7">
+                    <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                    <field name="OID">0_userdata.0.timer.sectoend</field>
+                    <field name="WITH_DELAY">FALSE</field>
+                    <value name="VALUE">
+                      <block type="math_number" id="Fs!IKseM?ou@T4iyRjq5">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <statement name="ELSE">
+          <block type="update" id="lOjCp#-JOuvc=7@%Zax1">
+            <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+            <field name="OID">0_userdata.0.timer.timetoend</field>
+            <field name="WITH_DELAY">FALSE</field>
+            <value name="VALUE">
+              <block type="convert_from_date" id="rco99G6.)zMa(]NvKr;i">
+                <mutation xmlns="http://www.w3.org/1999/xhtml" format="true" language="false"></mutation>
+                <field name="OPTION">custom</field>
+                <field name="FORMAT">JJJJ.MM.TT SS:mm:ss</field>
+                <value name="VALUE">
+                  <block type="get_value" id="N#_Bm%wVximV5R[aQ(sx">
+                    <field name="ATTR">val</field>
+                    <field name="OID">alexa2.0.Echo-Devices.<!-- device id of the alexa you want to use -->.Timer.nextTimerDate</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <next>
+              <block type="update" id="eN!wjn|dZb8)D8@p2y,g">
+                <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                <field name="OID">0_userdata.0.timer.now</field>
+                <field name="WITH_DELAY">FALSE</field>
+                <value name="VALUE">
+                  <block type="time_get" id="-OH6Ud,zocD|7;fKy`jz">
+                    <mutation xmlns="http://www.w3.org/1999/xhtml" format="true" language="false"></mutation>
+                    <field name="OPTION">custom</field>
+                    <field name="FORMAT">JJJJ.MM.TT SS:mm:ss</field>
+                  </block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>

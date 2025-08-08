@@ -1,0 +1,35 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="on" id="qBHY_b(vb@^vkl*8T.*s" x="-113" y="-37">
+    <field name="OID">0_userdata.0.timer.sectoend</field>
+    <field name="CONDITION">any</field>
+    <field name="ACK_CONDITION"></field>
+    <statement name="STATEMENT">
+      <block type="control_ex" id="r6hW81yQoLrVa#bZlnW3">
+        <field name="TYPE">false</field>
+        <field name="CLEAR_RUNNING">FALSE</field>
+        <value name="OID">
+          <shadow type="field_oid" id="]o|dV5SM=3yazrw,1J?(">
+            <field name="oid">mqtt.0.AlexaTimer.sectoend</field>
+          </shadow>
+          <block type="field_oid" id="zMw-d6,y1hS6`._63GA;">
+            <field name="oid">mqtt.0.AlexaTimer.sectoend</field>
+          </block>
+        </value>
+        <value name="VALUE">
+          <shadow type="logic_boolean" id="8!rOupF3@a3=.e5%[555">
+            <field name="BOOL">TRUE</field>
+          </shadow>
+          <block type="get_value" id="eLPMhPCLLj*v1*0wg})Z">
+            <field name="ATTR">val</field>
+            <field name="OID">0_userdata.0.timer.sectoend</field>
+          </block>
+        </value>
+        <value name="DELAY_MS">
+          <shadow type="math_number" id=")M6x{1$C@-$UG^4$$pA)">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+    </statement>
+  </block>
+</xml>
