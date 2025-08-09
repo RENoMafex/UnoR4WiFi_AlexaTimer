@@ -11,7 +11,7 @@ there is also a [Serial output version](https://github.com/RENoMafex/UnoR4WiFi_A
 
 ## Things you will need:
 - Arduino Uno R4 WiFi
-- The [platformIO][platformIO] ide
+- [platformIO][platformIO], either the cli, or the IDE in an editor.
 - A running instance of [ioBroker][ioBroker] (ex. on a RaspberryPi)
 - 4 shift registers (ex. SN74HC595)
 - 4 7-Segment displays
