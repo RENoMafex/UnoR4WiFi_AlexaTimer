@@ -5,16 +5,21 @@ there is also a [Serial output version](https://github.com/RENoMafex/UnoR4WiFi_A
 > [!WARNING]
 > This README is still WIP!
 
+> [!CAUTION]
+> This Repository does not cover everything you will need, to get it going from scratch.
+> If you are familiar with ioBroker, arduino or platformIO and soldering, it should be doable, if you are a complete beginner and have trouble setting everything up, don't hesitate to email me at \<schilling.malte@googlemail.com>
+
 ## Things you will need:
 - Arduino Uno R4 WiFi
-- A running instance of ioBroker (ex. on a RaspberryPi)
+- The [platformIO][platformIO] ide
+- A running instance of [ioBroker][ioBroker] (ex. on a RaspberryPi)
 - 4 shift registers (ex. SN74HC595)
 - 4 7-Segment displays
   - Maybe a few hands full of MOSFETs, if you use bigger 7-Segment displays
 - A soldering iron with some tin
 
 ## Things you will find in this Repo (when finished):
-- KiCad files for a circuit board
+- [KiCad][KiCad] files for a circuit board
   - Utilizes SN74HC595N pinouts
   - Utilizes MOSFETs
   - Support for selfmade RGB-LED 7-Segment displays
@@ -29,3 +34,7 @@ You will find 3 folders inside this repository, `ioBroker`, `platformIO` and `ha
 
 ## TODO:
 - Design circuit board
+
+[platformIO]:https://platformio.org/ "its free, lightweight, crossplatform and open source!"
+[ioBroker]: https://www.iobroker.net/ "also free and open source!"
+[KiCad]: https://www.kicad.org/ "you guessed it... free and open source!"
