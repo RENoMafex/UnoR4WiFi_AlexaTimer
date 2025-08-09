@@ -24,6 +24,8 @@ there is also a [Serial output version](https://github.com/RENoMafex/UnoR4WiFi_A
 - Code for ioBroker, to put the remainder of the timer onto MQTT
 - Instructions how to wire everything up
 
+## Setup:
+You will find 3 folders inside this repository, `ioBroker`, `platformIO` and `hardware`, with each one `README.md` file inside them, refer to the setup steps provided by these files.
+
 ## TODO:
-- Document how to set this project up in ioBroker.
 - Design circuit board
